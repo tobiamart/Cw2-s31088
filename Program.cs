@@ -72,9 +72,11 @@ public class LiquidContainer: Container, IHazardNotifier{
             Notify();
             throw new OverfillException($"Nie można załadować {mass} kg. Przekroczona maksymalna ładowność kontenera {SerialNumber}.");
         }
+
+        base.Load(mass);
     }
 
-    void Notify(){
+    public void Notify(){
         Console.Write($"Próba przekroczenia bezpiecznej ładowności kontenera {SerialNumber}.");
     }
 }
@@ -85,7 +87,10 @@ public class Program
     {
         try
         {
-
+           LiquidContainer container1 = new LiquidContainer(100, 20, 20, 2000, true);
+           LiquidContainer container2 = new LiquidContainer(100, 20, 20, 2000, false);
+           container2.Load(1000);
+           container2.Load(1100);
         }
         catch (OverfillException ex)
         {
