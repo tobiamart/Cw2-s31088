@@ -49,9 +49,9 @@ public abstract class Container
         LoadMass += mass;
     }
 
-    public void Unload()
+    public virtual void Unload(double mass)
     {
-        LoadMass = 0;
+        LoadMass -= mass;
     }
 
     public override string ToString()
@@ -70,14 +70,33 @@ public class LiquidContainer: Container, IHazardNotifier{
 
         if (LoadMass + mass > allowedCapacity){
             Notify();
-            throw new OverfillException($"Nie można załadować {mass} kg. Przekroczona maksymalna ładowność kontenera {SerialNumber}.");
-        }
 
-        base.Load(mass);
+        }
+        else
+        {
+            base.Load(mass);
+        }
     }
 
     public void Notify(){
-        Console.Write($"Próba przekroczenia bezpiecznej ładowności kontenera {SerialNumber}.");
+        Console.WriteLine($"Próba przekroczenia bezpiecznej ładowności kontenera {SerialNumber}.");
+    }
+}
+
+public class GasContainer : Container, IHazardNotifier{
+    public GasContainer(double ownWeight, double height, double depth, double maxCapacity) : base("G", ownWeight, height, depth, maxCapacity){}
+
+    public override void Unload(double mass){
+        if(mass > 0.95*LoadMass){
+            Notify();
+        }
+        else{
+            base.Unload(mass);
+        }
+    }
+
+    public void Notify(){
+        Console.WriteLine($"Nie można wyładować więcej niż 95% gazu");
     }
 }
 
