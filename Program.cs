@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml;
 
 public interface IHazardNotifier{
     void Notify();
@@ -140,6 +141,73 @@ public class RefridgeratorContainer: Container, IHazardNotifier{
     }
 }
 
+public class Ship{
+    public List<Container> Containers{ get; set; } = new List<Container>();
+    public double MaxSpeed{ get; set; }
+    public int MaxContainers{ get; set; }
+    public double MaxWeight{get; set; } 
+
+    public Ship(double maxSpeed, int maxContainers, double maxWeight){
+        MaxSpeed = maxSpeed;
+        MaxContainers = maxContainers;
+        MaxWeight = maxWeight;
+    }
+
+    private double CalculateCurrentWeight(){
+        double weight = 0;
+        foreach(Container cont in Containers){
+            weight += cont.OwnWeight + cont.LoadMass;
+        }
+        return weight;
+    }
+
+    public void AddContainer(Container container){
+        double weight = CalculateCurrentWeight() + container.OwnWeight + container.LoadMass;
+
+        if(weight > MaxWeight){
+            throw new OverfillException($"Zbyt dużo wagi na kontenerowcu");
+        }
+        else if(Containers.Count + 1 > MaxContainers){
+            throw new OverfillException($"Zbyt dużo kontenerów na kontenerowcu");
+        }
+        else
+        {
+        Containers.Add(container);
+        }
+    }
+
+    public void RemoveContainer(Container container){
+        if(Containers.Contains(container)){
+            Containers.Remove(container);
+        }
+        else
+        {
+            Console.WriteLine($"Nie istnieje na statku kontener: {container.SerialNumber} do usunięcia");        
+        }
+    }
+
+    public void TransferContainer(Container container, Ship ship){
+        if(Containers.Contains(container)){
+            Containers.Remove(container);
+            ship.AddContainer(container);
+        }
+        else
+        {
+            Console.WriteLine($"Nie istnieje na statku kontener: {container.SerialNumber} do przeniesienia");        
+        }
+    }
+
+
+    public override string ToString()
+    {
+        string containers = "";
+        foreach(Container cont in Containers){
+            containers += cont.SerialNumber + " ";
+        }
+        return $"Prędkość maksymalna: {MaxSpeed}, Zawartość: {containers}";
+    }
+}
+
 public class Program
 {
     public static void Main()
@@ -160,6 +228,12 @@ public class Program
            containerL.Load(1900, "Rocket Fuel");
            containerL.Load(1000, "Rocket Fuel");
            Console.WriteLine($"{containerL}");
+
+           Ship ship = new Ship(100, 2, 10000);
+           ship.AddContainer(containerC);
+           ship.AddContainer(containerL);
+           ship.AddContainer(containerG);
+           Console.WriteLine($"{ship}");
            
 
         }
