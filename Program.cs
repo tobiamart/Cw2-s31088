@@ -96,7 +96,7 @@ public class GasContainer : Container, IHazardNotifier{
     }
 
     public void Notify(){
-        Console.WriteLine($"Nie można wyładować więcej niż 95% gazu");
+        Console.WriteLine($"Nie można wyładować więcej niż 95% gazu z kontenera: {SerialNumber}");
     }
 }
 
@@ -110,6 +110,10 @@ public class Program
            LiquidContainer container2 = new LiquidContainer(100, 20, 20, 2000, false);
            container2.Load(1000);
            container2.Load(1100);
+
+           GasContainer container3 = new GasContainer(100, 20, 20, 1000);
+           container3.Load(1000);
+           container3.Unload(950);
         }
         catch (OverfillException ex)
         {
