@@ -199,15 +199,24 @@ public class Ship
         }
     }
 
-    public void RemoveContainer(Container container)
-    {
-        if (Containers.Contains(container))
-        {
-            Containers.Remove(container);
+    public void AddContainerList(List<Container> containers){
+        foreach (Container cont in containers){
+            this.AddContainer(cont);
         }
-        else
-        {
-            Console.WriteLine($"Nie istnieje na statku kontener: {container.SerialNumber} do usunięcia");
+    }
+
+    public void RemoveContainer(string serial)
+    {
+        Container toRemove = null;
+        bool found = false;
+        foreach (Container cont in Containers) {
+            if (cont.SerialNumber == serial){
+                toRemove = cont;
+                found = true;
+            }
+        }
+        if (found){
+            Containers.Remove(toRemove);
         }
     }
 
@@ -257,12 +266,23 @@ public class Program
             containerL.Load(1000, "Rocket Fuel");
             Console.WriteLine($"{containerL}");
 
-            Ship ship = new Ship(100, 2, 10000);
+            Ship ship = new Ship(100, 3, 10000);
             ship.AddContainer(containerC);
             ship.AddContainer(containerL);
             ship.AddContainer(containerG);
             Console.WriteLine($"{ship}");
 
+            ship.RemoveContainer("KON-L-3");
+            Console.WriteLine($"{ship}");
+            ship.AddContainer(containerL);
+
+            Ship ship1 = new Ship(300, 3, 10000);
+            ship.TransferContainer(containerL, ship1);
+            Console.WriteLine($"{ship1}");
+
+            List<Container> kontenery = [containerC, containerG];
+            ship1.AddContainerList(kontenery);
+            Console.WriteLine($"{ship1}");
 
         }
         catch (OverfillException ex)
